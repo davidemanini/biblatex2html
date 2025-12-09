@@ -59,8 +59,7 @@
     <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
     <span id="show-hide-checkboxes">
       Show: 
-      <input type="checkbox" id="key" class="show-hide" onclick="showHide(this);">
-      <label for="key">Key</label>
+      <label for="key"><input type="checkbox" id="key" class="show-hide" onclick="showHide(this);">Key</label>
       <input type="checkbox" id="type" class="show-hide" onclick="showHide(this);">
       <label for="type">Type</label>
       <input type="checkbox" id="date" class="show-hide" onclick="showHide(this);" checked>
@@ -69,7 +68,7 @@
     <table id="myTable">
       <tr class="header">
 	<th class="key" style="width:4%;">Key</th>
-	<th class="type" style="width:4%;">Key</th>
+	<th class="type" style="width:4%;">type</th>
 	<th class="date" style="width:4%;">Date</th>
 	<th class="author" style="width:20%;">Author</th>
 	<th style="width:50%;">Title</th>
@@ -91,7 +90,7 @@
 	</td>
 	<td class="title">
 	  {% if entry.file %}
-	  <a href="{{ entry.file[1:-4] }}">{{ entry.title }}</a>
+	  <a href="{{ entry.file }}">{{ entry.title }}</a>
 	  {% else %}
 	  {{ entry.title }}
 	  {% endif %}

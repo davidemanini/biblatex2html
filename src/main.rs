@@ -10,6 +10,7 @@ use std::{fs, io::Read};
 //use std::fmt::Display;
 use std::error;
 use serde::{Serialize, Deserialize};
+use regex::Regex;
 
 //use self::CmdOptions;
 
@@ -158,6 +159,15 @@ fn date_to_string(d: PermissiveType<Date>) -> Option<String> {
     }
 }
 
+fn jabref_file_parse(f: &str) -> Result<String, &str> {
+    let re = Regex::new(r":(.+):PDF").unwrap();
+    let res = re.find(f);
+    match res {
+	Some(a) => Result::Ok(a.as_str().to_string()),
+	None => Result::Err("Fail to parse jabref file field"),
+    }
+}
+
 impl BibEntry{
     fn from_entry(e: &Entry) -> Result<Self, Box<dyn error::Error>> {
 	Ok(Self{
@@ -177,7 +187,7 @@ impl BibEntry{
 				   .collect::<Vec<_>>()
 				   .join(""))),
 	    date: date_to_string(e.date().unwrap()),
-	    file: e.file().ok(),
+	    file: e.file().ok().and_then(|x| jabref_file_parse(&x).ok()),
 	    
 	    
 	})
