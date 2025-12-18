@@ -55,7 +55,7 @@ fn main() {
     let mut input = fs::File::open(args.bibtex).unwrap();
 
 
-    let mut content = String::new();	
+    let mut content = String::new();
     input.read_to_string(&mut content).unwrap();
 
     let biblio = Bibliography::parse(&content).unwrap();
@@ -80,7 +80,7 @@ fn main() {
 
     dbg!(entries.len());
     
-    for i in &entries {//[0..entries.len().min(4)] {
+    for i in &entries [0..entries.len().min(4)] {
 	println!("{:?}\n", i)
     }
 
@@ -137,9 +137,11 @@ struct BibEntry{
     pub author_list: Vec<Author>,
     pub title: String,
     pub url: Option<String>,
+    pub doi: Option<String>,
     pub journal: Option<String>,
     pub date: Option<String>,
     pub file: Option<String>,
+    pub note: Option<String>,
 //    pub localfile: Option<String>,
 }
 
@@ -161,10 +163,10 @@ fn date_to_string(d: PermissiveType<Date>) -> Option<String> {
 
 fn jabref_file_parse(f: &str) -> Result<String, &str> {
     let re = Regex::new(r":(.+):PDF").unwrap();
-    let res = re.find(f);
+    let res = re.captures(f);
     match res {
-	Some(a) => Result::Ok(a.as_str().to_string()),
-	None => Result::Err("Fail to parse jabref file field"),
+	Some(a) => Ok(a[1].to_string()),
+	None => Err("Fail to parse jabref file field"),
     }
 }
 
@@ -181,6 +183,7 @@ impl BibEntry{
 		.map(|x| x.v.get())
 		.collect::<Vec<_>>().join(""),
 	    url: e.url().ok(),
+	    doi: e.doi().ok(),
 	    journal: e.journal().ok()
 		.and_then(|x| Some(x.iter()
 				   .map(|y| y.v.get())
@@ -188,7 +191,11 @@ impl BibEntry{
 				   .join(""))),
 	    date: date_to_string(e.date().unwrap()),
 	    file: e.file().ok().and_then(|x| jabref_file_parse(&x).ok()),
-	    
+	    note: e.note().ok()
+		.and_then(|x| Some(x.iter()
+				   .map(|y| y.v.get())
+				   .collect::<Vec<_>>()
+				   .join(""))),
 	    
 	})
     }

@@ -91,11 +91,17 @@
 	<td class="title">
 	  {% if entry.file %}
 	  <a href="{{ entry.file }}">{{ entry.title }}</a>
+	  {% else %}{{ entry.title }}{% endif %}
+	</td>
+	<td class="journal">
+	  {% if entry.url %}
+	  <a href="{{ entry.url }}">{{ entry.journal or entry.note or '' }}</a>
+	  {% elif entry.doi %}
+	  <a href="https://doi.org/{{ entry.doi }}">{{ entry.journal or entry.note or '' }}</a>
 	  {% else %}
-	  {{ entry.title }}
+	  {{ entry.journal or entry.note or '' }}
 	  {% endif %}
 	</td>
-	<td class="journal">{{ entry.journal or '' }}</td>
       </tr>
       {% endfor %}
     </table>
