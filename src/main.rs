@@ -37,10 +37,27 @@ struct CmdOptions{
     /// Output file (default: stdout)
     #[arg(num_args(1))]
     output: Option<std::path::PathBuf>,
+
+    /// Print the default template on the standard output
+    #[arg(long)]
+    print_template: bool,
+
 }
 
 
-
+impl CmdOptions {
+    fn check(&self) -> Result<()> {
+	if self.print_template
+	    && (
+		self.input.is_some()
+		    || self.output.is_some()
+		    || self.template.is_some()
+	    ) {
+		return Err(anyhow::Error::msg("Option --print-template must be used alone"));
+	}
+	Ok(())
+    }
+}
 
 fn get_bibliography(content: &str) -> Result<Vec<BibEntry>> {
     let biblio = Bibliography::parse(&content).context("Fail to parse BibTeX")?;
@@ -51,6 +68,16 @@ fn get_bibliography(content: &str) -> Result<Vec<BibEntry>> {
     
 
 fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
+
+    args.check()?;
+
+    let mut table = include_str!("table.html").to_string();
+
+
+    if args.print_template {
+	print!("{}", &table);
+	return Ok(());
+    }
 
     let mut input: Box<dyn Read> = match &args.input {
 	Some(input) => Box::new(
@@ -66,7 +93,6 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
 
     let entries = get_bibliography(&content)?;
 
-    let mut table = include_str!("table.html").to_string();
     if let Some(filename) = &args.template {
 	fs::File::open(filename)
 	    .with_context(|| format!("Fail to open template file {:#?}", filename))?
