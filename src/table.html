@@ -22,7 +22,7 @@
       }
 
       function filter() {
-	  var input, filter, table, tr, td, i;
+	  var input, filter, table, tr, td, i, nResult, nResultBox;
 	  input = document.getElementById("myInput");
 	  if (input) {
 	      filter = input.value.toUpperCase().trim().split(" ");
@@ -31,14 +31,19 @@
 	  }
 	  table = document.getElementById("bibtable");
 	  tr = table.getElementsByTagName("tr");
+	  nResult = 0;
 	  for (i = 1; i < tr.length; i++) {
 	      td = tr[i].getElementsByTagName("td");
 	      if (lineMatch(td, filter)) {
 		  tr[i].style.display = "";
+		  nResult++;
 	      } else {
 		  tr[i].style.display = "none";
 	      }
 	  }
+	  nResultBox = document.getElementById("result-number")
+	  nResultBox.innerText = nResult.toString();
+	  console.log(nResultBox);
       }
 
       function showHide(checkbox) {
@@ -69,6 +74,10 @@
   </head>
   <body onload="onLoad();">
     <input type="text" id="myInput" onkeyup="filter()" placeholder="Search for names..">
+    <span id="result-info">
+      No. of entries: <span id="result-number"></span>.
+    </span>
+
     <span id="show-hide-checkboxes">
       Show: 
       <label for="key"><input type="checkbox" id="key" class="show-hide" onclick="showHide(this);">Key</label>
