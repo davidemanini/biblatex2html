@@ -94,6 +94,7 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
     let entries = get_bibliography(&content)?;
 
     if let Some(filename) = &args.template {
+	table = "".to_string();
 	fs::File::open(filename)
 	    .with_context(|| format!("Fail to open template file {:#?}", filename))?
 	    .read_to_string(&mut table)
