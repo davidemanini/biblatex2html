@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Bibliography</title>
-    <script>
+    <meta charSet="utf-8">
+    <script type="text/javascript">
       class FilterSortTable {
 	  'use strict';
 	  constructor(tableNode, filterBox, nResultBox) {
@@ -96,14 +96,15 @@
 			  document.getElementById("result-number"));
       }
     </script>
-    <style>
+    <style type="text/css">
       .hidden-content {
 	  display: none;
       }
     </style>
+    <title>Bibliography</title>
   </head>
   <body onload="onLoad();">
-    <input type="text" id="myInput" placeholder="Search for names..">
+    <input type="text" id="myInput">
     <span id="result-info">
       No. of entries: <span id="result-number"></span>.
     </span>
@@ -130,7 +131,6 @@
       <tbody>
       {% for entry in biblio %}
       <tr class="body">
-	<!---	<td class="author">{{ entry.author }}</td> --->
 	<td class="key">{{ entry.key or '' }}</td>
 	<td class="type">{{ entry.bib_type or '' }}</td>
 	<td class="date">{{ entry.date or '' }}</td>
