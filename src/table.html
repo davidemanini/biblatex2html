@@ -3,48 +3,42 @@
   <head>
     <title>Bibliography</title>
     <script>
-      function lineMatch(td, filter) {
-	  var  j, k, txtValue, foundFilter;
-	  for (k = 0; k < filter.length; k++) {
-	      foundFilter = false;
-	      for (j = 0; j < td.length; j++) {
-		  txtValue = td[j].textContent || td[j].innerText;
-		  if (txtValue.toUpperCase().indexOf(filter[k]) > -1) {
-		      foundFilter = true;
-		      break;
-		  }
-	      }
-	      if (foundFilter == false) {
-		  return false;
-	      }
+      class FilterTable {
+	  'use strict';
+	  constructor(tableNode, filterBox, nResultBox) {
+	      this.tableNode = tableNode;
+
+	      this.table = [...this.tableNode.querySelectorAll('tbody tr')]
+		  .map( a => ({
+		      line: a,
+		      content: [...a.querySelectorAll('td')]
+			  .map(b => b.textContent || b.innerText),
+		  }));
+	      this.nResultBox = nResultBox;
+	      this.filterBox = filterBox;
+	      this.filterBox.addEventListener('keyup', a => this.filter());
+	      this.filter();
 	  }
-	  return true;
+
+	  filter() {
+	      const lineMatch = (content, filter) => filter.every(
+		  b => content.some(
+		      a => a.toUpperCase().indexOf(b) > -1));
+
+	      const filter = this.filterBox.value.toUpperCase().trim().split(" ");
+	      var nResult = 0;
+	      this.table.forEach(a => {
+		  if (lineMatch(a.content, filter)) {
+		      a.line.style.display = "";
+		      nResult++;
+		  } else {
+		      a.line.style.display = "none";
+		  }
+	      });
+	      this.nResultBox.innerText = nResult.toString();
+	  }
       }
 
-      function filter() {
-	  var input, filter, table, tr, td, i, nResult, nResultBox;
-	  input = document.getElementById("myInput");
-	  if (input) {
-	      filter = input.value.toUpperCase().trim().split(" ");
-	  } else {
-	      return;
-	  }
-	  table = document.getElementById("bibtable");
-	  tr = table.getElementsByTagName("tr");
-	  nResult = 0;
-	  for (i = 1; i < tr.length; i++) {
-	      td = tr[i].getElementsByTagName("td");
-	      if (lineMatch(td, filter)) {
-		  tr[i].style.display = "";
-		  nResult++;
-	      } else {
-		  tr[i].style.display = "none";
-	      }
-	  }
-	  nResultBox = document.getElementById("result-number")
-	  nResultBox.innerText = nResult.toString();
-	  console.log(nResultBox);
-      }
 
       function showHide(checkbox) {
 	  var table, elements, hide, i, disp, cl;
@@ -63,17 +57,19 @@
 
       function onLoad() {
 	  var cb_div, cb_list, i;
-	  filter();
 	  cb_div = document.getElementById("show-hide-checkboxes");
 	  cb_list = cb_div.getElementsByTagName("input");
 	  for (i = 0; i < cb_list.length; i++) {
 	      showHide(cb_list[i]);
 	  }
+	  new FilterTable(document.getElementById("bibtable"),
+			  document.getElementById("myInput"),
+			  document.getElementById("result-number"));
       }
     </script>
   </head>
   <body onload="onLoad();">
-    <input type="text" id="myInput" onkeyup="filter()" placeholder="Search for names..">
+    <input type="text" id="myInput" placeholder="Search for names..">
     <span id="result-info">
       No. of entries: <span id="result-number"></span>.
     </span>
@@ -87,6 +83,7 @@
       <label for="date">Date</label>
     </span>
     <table id="bibtable">
+      <thead>
       <tr class="header">
 	<th class="key" style="width:4%;">Key</th>
 	<th class="type" style="width:4%;">type</th>
@@ -95,6 +92,8 @@
 	<th style="width:50%;">Title</th>
 	<th style="width:20%;">Journal</th>
       </tr>
+      </thead>
+      <tbody>
       {% for entry in biblio %}
       <tr class="body">
 	<!---	<td class="author">{{ entry.author }}</td> --->
@@ -125,6 +124,7 @@
 	</td>
       </tr>
       {% endfor %}
+      </tbody>
     </table>
   </body>
 </html>
