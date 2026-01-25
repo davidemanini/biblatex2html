@@ -13,7 +13,11 @@
 		  .map( a => ({
 		      line: a,
 		      content: [...a.querySelectorAll('td')]
-			  .map(b => b.textContent || b.innerText),
+			  .map(b =>
+			      (c => c && c.textContent
+			      )(b.querySelector('.hidden-content')) ||
+				  b.textContent || b.innerText
+			      ),
 		  }));
 	      this.nResultBox = nResultBox;
 	      this.filterBox = filterBox;
@@ -28,6 +32,9 @@
 	  }
 
 	  sort(key) {
+	      if (key != this.sortKey) {
+		  this.sortAsc = true;
+	      }
 	      const compare = (f =>
 		  this.sortAsc ? ((a,b) => f(a,b)) : ((a,b) => f(b,a))
 	      )(
@@ -89,6 +96,11 @@
 			  document.getElementById("result-number"));
       }
     </script>
+    <style>
+      .hidden-content {
+	  display: none;
+      }
+    </style>
   </head>
   <body onload="onLoad();">
     <input type="text" id="myInput" placeholder="Search for names..">
@@ -129,6 +141,12 @@
 	  {% endfor %}
 	  {{ entry.author_list[-1].name[0:1] }}.
 	  {{ entry.author_list[-1].surname }}
+	  <span class="hidden-content">
+	  {% for author in entry.author_list %}
+	  {{ author.surname }}
+	  {{ author.name }}
+	  {% endfor %}
+	  </span>
 	</td>
 	<td class="title">
 	  {% if entry.file %}
