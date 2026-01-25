@@ -3,11 +3,12 @@
   <head>
     <title>Bibliography</title>
     <script>
-      class FilterTable {
+      class FilterSortTable {
 	  'use strict';
 	  constructor(tableNode, filterBox, nResultBox) {
 	      this.tableNode = tableNode;
-
+	      this.sortKey = null;
+	      this.sortAsc = true;
 	      this.table = [...this.tableNode.querySelectorAll('tbody tr')]
 		  .map( a => ({
 		      line: a,
@@ -17,7 +18,28 @@
 	      this.nResultBox = nResultBox;
 	      this.filterBox = filterBox;
 	      this.filterBox.addEventListener('keyup', a => this.filter());
+
+	      var th = [...this.tableNode.querySelectorAll('thead  th')];
+	      for (let i = 0; i < th.length; i++) {
+		  th[i].addEventListener('click', a => this.sort(i));
+	      }
+
 	      this.filter();
+	  }
+
+	  sort(key) {
+	      const compare = (f =>
+		  this.sortAsc ? ((a,b) => f(a,b)) : ((a,b) => f(b,a))
+	      )(
+		  (a, b) => a.content[key].localeCompare(b.content[key])
+	      );
+	      this.table.sort(compare);
+
+	      this.table.forEach( a =>
+		  this.tableNode.appendChild(a.line));
+
+	      this.sortKey = key;
+	      this.sortAsc = !this.sortAsc;
 	  }
 
 	  filter() {
@@ -62,7 +84,7 @@
 	  for (i = 0; i < cb_list.length; i++) {
 	      showHide(cb_list[i]);
 	  }
-	  new FilterTable(document.getElementById("bibtable"),
+	  new FilterSortTable(document.getElementById("bibtable"),
 			  document.getElementById("myInput"),
 			  document.getElementById("result-number"));
       }
