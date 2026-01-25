@@ -16,6 +16,7 @@ use std::error;
 use serde::{Serialize, Deserialize};
 use regex::Regex;
 use anyhow::{Context, Result};
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 
 
 use clap::{Parser};
@@ -116,10 +117,10 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
     Ok(())
 }
 
-
-
 fn build_html(template: &str, entries: &Vec<BibEntry>) -> anyhow::Result<String> {
     let mut env = Environment::new();
+    env.add_filter("urlencode", |s: String| Ok(utf8_percent_encode(&s, NON_ALPHANUMERIC)
+					       .to_string()));
     env.add_template("index.html", &template).context("Syntax error in the template")?;
     let template = env.get_template("index.html").unwrap();
     Ok(template.render(

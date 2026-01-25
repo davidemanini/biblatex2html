@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charSet="utf-8">
-    <script type="text/javascript">
+    <script>
       class FilterSortTable {
 	  'use strict';
 	  constructor(tableNode, filterBox, nResultBox) {
@@ -96,7 +96,7 @@
 			  document.getElementById("result-number"));
       }
     </script>
-    <style type="text/css">
+    <style>
       .hidden-content {
 	  display: none;
       }
@@ -150,14 +150,14 @@
 	</td>
 	<td class="title">
 	  {% if entry.file %}
-	  <a href="{{ entry.file }}">{{ entry.title }}</a>
+	  <a href="{{ entry.file|urlencode }}">{{ entry.title }}</a>
 	  {% else %}{{ entry.title }}{% endif %}
 	</td>
 	<td class="journal">
 	  {% if entry.url %}
 	  <a href="{{ entry.url }}">{{ entry.journal or entry.note or '' }}</a>
 	  {% elif entry.doi %}
-	  <a href="https://doi.org/{{ entry.doi }}">{{ entry.journal or entry.note or '' }}</a>
+	  <a href="https://doi.org/{{ entry.doi|urlencode }}">{{ entry.journal or entry.note or '' }}</a>
 	  {% else %}
 	  {{ entry.journal or entry.note or '' }}
 	  {% endif %}
