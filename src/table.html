@@ -14,10 +14,11 @@
 		      line: a,
 		      content: [...a.querySelectorAll('td')]
 			  .map(b =>
-			      (c => c && c.textContent
+			      ((c => c && c.textContent
 			      )(b.querySelector('.hidden-content')) ||
 				  b.textContent || b.innerText
-			      ),
+			      ).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+			  ),
 		  }));
 	      this.nResultBox = nResultBox;
 	      this.filterBox = filterBox;
@@ -54,7 +55,9 @@
 		  b => content.some(
 		      a => a.toUpperCase().indexOf(b) > -1));
 
-	      const filter = this.filterBox.value.toUpperCase().trim().split(" ");
+	      const filter = this.filterBox.value
+		    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+		    .toUpperCase().trim().split(" ");
 	      var nResult = 0;
 	      this.table.forEach(a => {
 		  if (lineMatch(a.content, filter)) {
