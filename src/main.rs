@@ -137,6 +137,24 @@ fn build_html(template: &str, entries: &Vec<BibEntry>, var: &Variables) -> anyho
     let mut env = Environment::new();
     env.add_filter("urlencode", |s: String| Ok(utf8_percent_encode(&s, NON_ALPHANUMERIC)
 					       .to_string()));
+    env.add_filter("abbreviate_name", |name: &str|
+		   name.split(" ").map(|s| s.split("-").filter_map(|p| {
+		       match p.chars().next() {
+			   None => None,
+			   Some(ch) => {
+			       // Japanese names could contain a dash,
+			       // yet they are abbreviated with only
+			       // the first letter
+			       if ch.is_uppercase() {
+				   return Some(ch.to_string()+".");
+			       }
+			       None
+			   }
+		       }
+		   }).collect::<Vec<_>>().join("-")
+		   ).collect::<Vec<_>>().join(" ")
+    );
+
     env.add_template("index.html", &template).context("Syntax error in the template")?;
     let template = env.get_template("index.html").unwrap();
     Ok(template.render(
