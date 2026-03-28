@@ -3,6 +3,7 @@
   <head>
     <meta charSet="utf-8">
     <script>
+      let dbg = a => {console.log(a); return a};
       'use strict';
       class FilterSortTable {
 	  constructor(tableNode, filterBox, nResultBox,
@@ -15,8 +16,9 @@
 		      line: a,
 		      content: [...a.querySelectorAll('td')]
 			  .map(b =>
-			      ((c => c && c.textContent
-			      )(b.querySelector('.hidden-content')) ||
+			      ((c => c.length &&
+				c.map(d => d.textContent).join(' ')
+			      )([...b.querySelectorAll('.hidden-content')]) ||
 				  b.textContent || b.innerText
 			      ).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 			  ),
@@ -37,6 +39,9 @@
 		  cb.addEventListener('click', a => this.showHide(cb));
 		  this.showHide(cb);
 	      });
+
+	      [...this.tableNode.querySelectorAll('span.click-to-search')]
+		  .map(a => this.handleClickToSearch(a));
 	  }
 
 	  sort(key) {
@@ -77,6 +82,15 @@
 	      this.nResultBox.innerText = nResult.toString();
 	  }
 
+	  handleClickToSearch(element) {
+	      let query = (e => e && (e.textContent || e.innerText)
+			  )(element.querySelector('.hidden-content'));
+	      element.addEventListener('click', e => {
+		  this.filterBox.value = query;
+		  this.filter();
+	      });
+	  }
+
 	  showHide(checkBox) {
 	      const disp = checkBox.checked ? "" : "none";
 	      this.tableNode.querySelectorAll("." + checkBox.id)
@@ -107,8 +121,10 @@
 	  text-decoration-line: none;
       }
 
-      .author-table {
+      .click-to-search {
 	  white-space: nowrap;
+	  color: blue;
+	  cursor: pointer;
       }
     </style>
     <title>Bibliography</title>
@@ -147,24 +163,15 @@
 	<td class="type">{{ entry.bib_type or '' }}</td>
 	<td class="date">{{ entry.date or '' }}</td>
 	<td class="author">
-	  {%- if entry.author_list | length <= 4 %}
 	  {% for author in entry.author_list -%}
-	  <span class="author-table">
-	    {{- author.name | abbreviate_name }} {{ author.surname -}}
+	  <span class="click-to-search"><span class="hidden-content">
+	      {{- author.name }} {{ author.surname -}}
+	    </span>
+	      {{- author.name | abbreviate_name }} {{ author.surname -}}
 	  </span>
 	  {%- if not loop.last and loop.length > 2 -%}, {% endif -%}
 	  {% if loop.revindex0 == 1 %} and {% endif %}
 	  {% endfor %}
-	  {% else %}
-	  <span class="author-table">
-	    {{- entry.author_list[0].name | abbreviate_name }} {{ entry.author_list[0].surname -}}
-	  </span>, et al.
-	  {% endif %}
-	  <span class="hidden-content">
-	  {%- for author in entry.author_list %}
-	  {{ author.surname }} {{ author.name }}
-	  {% endfor -%}
-	  </span>
 	</td>
 	<td class="title">
 	  {% if entry.file %}
