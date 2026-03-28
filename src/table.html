@@ -6,9 +6,9 @@
       let dbg = a => {console.log(a); return a};
       'use strict';
       class FilterSortTable {
-	  constructor(tableNode, filterBox, nResultBox,
-		      showHideCheckboxes) {
-	      this.tableNode = tableNode;
+	  constructor(tableNode, commands) {
+	      this.tableNode = tableNode
+
 	      this.sortKey = null;
 	      this.sortAsc = true;
 	      this.table = [...this.tableNode.querySelectorAll('tbody tr')]
@@ -23,8 +23,8 @@
 			      ).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 			  ),
 		  }));
-	      this.nResultBox = nResultBox;
-	      this.filterBox = filterBox;
+	      this.nResultBox = commands.querySelector('.result-number');
+	      this.filterBox = commands.querySelector('.filter-query');
 	      this.filterBox.addEventListener('keyup', a => this.filter());
 
 	      var th = [...this.tableNode.querySelectorAll('thead  th')];
@@ -34,7 +34,7 @@
 
 	      this.filter();
 
-	      this.showHideCheckboxes = [... showHideCheckboxes];
+	      this.showHideCheckboxes = [... commands.querySelectorAll('.show-hide')];
 	      this.showHideCheckboxes.forEach(cb => {
 		  cb.addEventListener('click', a => this.showHide(cb));
 		  this.showHide(cb);
@@ -42,6 +42,9 @@
 
 	      [...this.tableNode.querySelectorAll('span.click-to-search')]
 		  .map(a => this.handleClickToSearch(a));
+
+	      this.clearButton = commands.querySelector('.clear');
+	      this.clearButton.addEventListener('click', a => this.clear())
 	  }
 
 	  sort(key) {
@@ -97,14 +100,17 @@
 		  .forEach(a => a.style.display = disp);
 	  }
 
+	  clear() {
+	      this.filterBox.value = '';
+	      this.filter();
+	  }
+
       }
 
 
       function onLoad() {
 	  new FilterSortTable(document.getElementById("bibtable"),
-			      document.getElementById("myInput"),
-			      document.getElementById("result-number"),
-			      document.querySelectorAll("#show-hide-checkboxes input")
+			      document.getElementById("commands")
 			     );
       }
     </script>
@@ -130,9 +136,11 @@
     <title>Bibliography</title>
   </head>
   <body onload="onLoad();">
-    <input type="text" id="myInput">
+    <form id="commands">
+    <input type="text" class="filter-query">
+    <button type="button" class="clear">Clear</button>
     <span id="result-info">
-      No. of entries: <span id="result-number"></span>.
+      No. of entries: <span class="result-number"></span>.
     </span>
 
     <span id="show-hide-checkboxes">
@@ -141,6 +149,7 @@
       <label for="type"><input type="checkbox" id="type" class="show-hide">Type</label>
       <label for="date"><input type="checkbox" id="date" class="show-hide">Date</label>
     </span>
+    </form>
     <table id="bibtable">
       <thead>
       <tr class="header">
