@@ -147,21 +147,23 @@
 	<td class="type">{{ entry.bib_type or '' }}</td>
 	<td class="date">{{ entry.date or '' }}</td>
 	<td class="author">
-	  {% if entry.author_list | length <= 4 %}
-	  {% for author in entry.author_list %}
-	  <span class="author-table">{{ author.name | abbreviate_name}}
-	    {{ author.surname }}</span>{% if not loop.last and loop.length > 2 %}, {% endif %}
+	  {%- if entry.author_list | length <= 4 %}
+	  {% for author in entry.author_list -%}
+	  <span class="author-table">
+	    {{- author.name | abbreviate_name }} {{ author.surname -}}
+	  </span>
+	  {%- if not loop.last and loop.length > 2 -%}, {% endif -%}
 	  {% if loop.revindex0 == 1 %} and {% endif %}
 	  {% endfor %}
 	  {% else %}
-	  <span class="author-table">{{ entry.author_list[0].name | abbreviate_name }}
-	    {{ entry.author_list[0].surname }}</span>, et al.
+	  <span class="author-table">
+	    {{- entry.author_list[0].name | abbreviate_name }} {{ entry.author_list[0].surname -}}
+	  </span>, et al.
 	  {% endif %}
 	  <span class="hidden-content">
-	  {% for author in entry.author_list %}
-	  {{ author.surname }}
-	  {{ author.name }}
-	  {% endfor %}
+	  {%- for author in entry.author_list %}
+	  {{ author.surname }} {{ author.name }}
+	  {% endfor -%}
 	  </span>
 	</td>
 	<td class="title">

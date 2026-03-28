@@ -135,6 +135,9 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
 
 fn build_html(template: &str, entries: &Vec<BibEntry>, var: &Variables) -> anyhow::Result<String> {
     let mut env = Environment::new();
+    env.set_trim_blocks(true);
+    env.set_lstrip_blocks(true);
+
     env.add_filter("urlencode", |s: String| Ok(utf8_percent_encode(&s, NON_ALPHANUMERIC)
 					       .to_string()));
     env.add_filter("abbreviate_name", |name: &str|
