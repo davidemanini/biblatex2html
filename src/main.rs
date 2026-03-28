@@ -19,7 +19,7 @@ use anyhow::{Context, Result};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 
 
-use clap::{Parser};
+use clap::Parser;
 
 
 #[derive(Parser, Debug)]
@@ -43,9 +43,25 @@ struct CmdOptions{
     #[arg(long)]
     print_template: bool,
 
+    /// Do not render LaTeX math formulas
+    #[arg(long)]
+    no_math: bool,
+
 }
 
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Variables {
+    no_math: bool,
+}
+
+impl Variables {
+    fn from_cmdoptions(cmd: &CmdOptions) -> Self {
+	Self{
+	    no_math: cmd.no_math,
+	}
+    }
+}
 impl CmdOptions {
     fn check(&self) -> Result<()> {
 	if self.print_template
@@ -102,7 +118,7 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
 	    .with_context(|| format!("Fail to read template file {:#?}", filename))?;
     }
 
-    let html = build_html(&table, &entries)?;
+    let html = build_html(&table, &entries, &Variables::from_cmdoptions(args))?;
 
     let mut output: Box<dyn Write> = match &args.output {
 	Some(output) =>	Box::new(fs::File::create(output)
@@ -117,14 +133,15 @@ fn run_everithing(args: &CmdOptions) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn build_html(template: &str, entries: &Vec<BibEntry>) -> anyhow::Result<String> {
+fn build_html(template: &str, entries: &Vec<BibEntry>, var: &Variables) -> anyhow::Result<String> {
     let mut env = Environment::new();
     env.add_filter("urlencode", |s: String| Ok(utf8_percent_encode(&s, NON_ALPHANUMERIC)
 					       .to_string()));
     env.add_template("index.html", &template).context("Syntax error in the template")?;
     let template = env.get_template("index.html").unwrap();
     Ok(template.render(
-	context!{biblio => entries}
+	context!{biblio => entries,
+	var => var}
     ).context("Fail to render template")?)
 }
 
@@ -164,6 +181,7 @@ struct BibEntry{
     pub author: String,
     pub author_list: Vec<Author>,
     pub title: String,
+    pub title_html: String,
     pub url: Option<String>,
     pub doi: Option<String>,
     pub journal: Option<String>,
@@ -206,9 +224,8 @@ impl BibEntry{
 	    author: e.author()?.iter()
 		.map(|x| person_to_string(x))
 		.collect::<Vec<_>>().join(", "),
-	    title: e.title()?.iter()
-		.map(|x| x.v.get())
-		.collect::<Vec<_>>().join(""),
+	    title: chunks_to_str(e.title()?),
+	    title_html: chunks_to_html(e.title()?),
 	    url: e.url().ok(),
 	    doi: e.doi().ok(),
 	    journal: e.journal().ok()
@@ -234,4 +251,14 @@ impl BibEntry{
 
 fn chunks_to_str(c: &[Spanned<Chunk>]) -> String {
     c.iter().map(|y| y.v.get()).collect::<Vec<_>>().join("")
+}
+
+fn chunks_to_html(c: &[Spanned<Chunk>]) -> String {
+    c.iter().map(|y| {
+	match &y.v {
+	    Chunk::Normal(a) => html_escape::encode_safe(a).to_string(),
+	    Chunk::Verbatim(a) => html_escape::encode_safe(a).to_string(),
+	    Chunk::Math(a) => katex::render(a).unwrap(),
+	}
+    }).collect::<Vec<_>>().join("")
 }

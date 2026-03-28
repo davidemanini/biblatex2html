@@ -7,6 +7,8 @@ edition = "2024"
 anyhow = "1.0.100"
 biblatex = "0.11.0"
 clap = { version = "4.5.53", features = ["derive"] }
+html-escape = "0.2.13"
+katex = "0.4.6"
 minijinja = "2.12.0"
 percent-encoding = "2.3.2"
 regex = "1.12.2"
