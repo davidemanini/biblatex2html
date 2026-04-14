@@ -43,15 +43,13 @@ biblatex2html --print-template
 
 ## Roadmap/Future developments
 
- * Take several input file
+ * Take several input files
  * Add more columns
  * Improve the search feature:
    * Search on different fields
    * Fuzzy search
    * Regex?
    * ...
- * Sort by column
- * Add a sane CSS
  * Apply global filters
  * ...
  

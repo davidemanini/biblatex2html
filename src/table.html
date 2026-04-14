@@ -125,41 +125,85 @@
 
       a.no-decoration {
 	  text-decoration-line: none;
+	  color: #6bf;
       }
 
       .click-to-search {
 	  white-space: nowrap;
-	  color: blue;
+	  color: #6bf;
 	  cursor: pointer;
       }
+
+      thead {
+	  position: sticky;
+	  top: 0;
+	  background-color: #111;
+      }
+
+      body {
+	  background-color: #111;
+	  color: white;
+	  margin-top: 0px;
+      }
+
+      input, button {
+	  background-color: #111;
+	  color: white;
+      }
+
+      tr.body:hover {
+	  background-color: #333;
+      }
+
+      table {
+	  border-spacing: 0px;
+      }
+
+      tr.body > td {
+	  padding: 4px;
+	  border: solid 0.1px #555;
+      }
+
+      thead th {
+	  padding-bottom: 6px;
+	  border-bottom: solid 0.1px #555;
+      }
+
+      thead td {
+	  padding: 8px;
+      }
+
     </style>
     <title>Bibliography</title>
   </head>
   <body onload="onLoad();">
-    <form id="commands">
-    <input type="text" class="filter-query">
-    <button type="button" class="clear">Clear</button>
-    <span id="result-info">
-      No. of entries: <span class="result-number"></span>.
-    </span>
-
-    <span id="show-hide-checkboxes">
-      Show: 
-      <label for="key"><input type="checkbox" id="key" class="show-hide">Key</label>
-      <label for="type"><input type="checkbox" id="type" class="show-hide">Type</label>
-      <label for="date"><input type="checkbox" id="date" class="show-hide">Date</label>
-    </span>
-    </form>
     <table id="bibtable">
       <thead>
-      <tr class="header">
-	<th class="key" style="width:4%;">Key</th>
-	<th class="type" style="width:4%;">type</th>
-	<th class="date" style="width:4%;">Date</th>
-	<th class="author" style="width:20%;">Author</th>
-	<th style="width:50%;">Title</th>
-	<th style="width:20%;">Journal</th>
-      </tr>
+	<tr id="preheader">
+	  <td colspan="6">
+	  <form id="commands">
+	    <input type="text" class="filter-query">
+	    <button type="button" class="clear">Clear</button>
+	    <span id="result-info">
+	      No. of entries: <span class="result-number"></span>.
+	    </span>
+	    <span id="show-hide-checkboxes">
+	      Show:
+	      <label for="key"><input type="checkbox" id="key" class="show-hide">Key</label>
+	      <label for="type"><input type="checkbox" id="type" class="show-hide">Type</label>
+	      <label for="date"><input type="checkbox" id="date" class="show-hide">Date</label>
+	    </span>
+	  </form>
+	  </td>
+	</tr>
+	<tr class="header">
+	  <th class="key" style="width:4%;">Key</th>
+	  <th class="type" style="width:4%;">type</th>
+	  <th class="date" style="width:4%;">Date</th>
+	  <th class="author" style="width:20%;">Author</th>
+	  <th style="width:50%;">Title</th>
+	  <th style="width:20%;">Journal</th>
+	</tr>
       </thead>
       <tbody>
       {% for entry in biblio %}
