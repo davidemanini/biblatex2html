@@ -32,8 +32,6 @@
 		  th[i].addEventListener('click', a => this.sort(i));
 	      }
 
-	      this.filter();
-
 	      this.showHideCheckboxes = [... commands.querySelectorAll('.show-hide')];
 	      this.showHideCheckboxes.forEach(cb => {
 		  cb.addEventListener('click', a => this.showHide(cb));
@@ -45,6 +43,9 @@
 
 	      this.clearButton = commands.querySelector('.clear');
 	      this.clearButton.addEventListener('click', a => this.clear())
+
+	      this.filter();
+	      this.focus();
 	  }
 
 	  sort(key) {
@@ -63,6 +64,7 @@
 
 	      this.sortKey = key;
 	      this.sortAsc = !this.sortAsc;
+	      this.focus();
 	  }
 
 	  filter() {
@@ -89,8 +91,9 @@
 	      let query = (e => e && (e.textContent || e.innerText)
 			  )(element.querySelector('.hidden-content'));
 	      element.addEventListener('click', e => {
-		  this.filterBox.value = query;
+		  this.filterBox.value = query + ' ';
 		  this.filter();
+		  this.focus();
 	      });
 	  }
 
@@ -103,6 +106,12 @@
 	  clear() {
 	      this.filterBox.value = '';
 	      this.filter();
+	      this.focus();
+	  }
+
+	  focus() {
+	      this.filterBox.selectionEnd = this.filterBox.selectionBegin = this.filterBox.value.length;
+	      this.filterBox.focus();
 	  }
 
       }
@@ -182,7 +191,7 @@
 	<tr id="preheader">
 	  <td colspan="6">
 	  <form id="commands">
-	    <input type="text" class="filter-query">
+	    <input type="search" class="filter-query" label="Search bibliography..." autofocus>
 	    <button type="button" class="clear">Clear</button>
 	    <span id="result-info">
 	      No. of entries: <span class="result-number"></span>.
